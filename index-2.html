@@ -458,7 +458,7 @@ function openJournalEditor(sid) {
 function clearJournalForm() {
   ['j-period','j-mid','j-mock','hw-curr','hw-done','hw-school','hw-rec'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   for(let i=1;i<=16;i++) { const el=document.getElementById('hw-'+i); if(el) el.value='-'; }
-  ['hw-ans1','hw-ans2'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value='-'; });
+  for(let i=1;i<=8;i++) { const el=document.getElementById('hw-ans'+i); if(el) el.value='-'; }
   for(let i=1;i<=4;i++) ['school','score','cut','fb'].forEach(f=>{ const el=document.getElementById('ex'+i+'-'+f); if(el) el.value=''; });
   for(let i=1;i<=8;i++) { ['date','content'].forEach(f=>{ const el=document.getElementById('p'+i+'-'+f); if(el) el.value=''; }); const s=document.getElementById('p'+i+'-sym'); if(s) s.value='-'; }
   for(let i=1;i<=7;i++) { ['teacher','content'].forEach(f=>{ const el=document.getElementById('c'+i+'-'+f); if(el) el.value=''; }); }
@@ -473,12 +473,13 @@ function loadJournalForm(j) {
   for(let i=1;i<=7;i++) { sv('c'+i+'-teacher',j.counsel&&j.counsel[i]&&j.counsel[i].teacher||''); sv('c'+i+'-content',j.counsel&&j.counsel[i]&&j.counsel[i].content||''); }
 }
 function readJournalForm() {
-  const hw={}, exams={}, progress={}, counsel={};
+  const hw={}, hwAns={}, exams={}, progress={}, counsel={};
   for(let i=1;i<=16;i++) hw[i]=gv('hw-'+i);
+  for(let i=1;i<=8;i++) hwAns[i]=gv('hw-ans'+i);
   for(let i=1;i<=4;i++) exams[i]={ school:gv('ex'+i+'-school'), score:gv('ex'+i+'-score'), cut:gv('ex'+i+'-cut'), fb:gv('ex'+i+'-fb') };
   for(let i=1;i<=8;i++) progress[i]={ date:gv('p'+i+'-date'), sym:gv('p'+i+'-sym'), content:gv('p'+i+'-content') };
   for(let i=1;i<=7;i++) counsel[i]={ teacher:gv('c'+i+'-teacher'), content:gv('c'+i+'-content') };
-  return { studentId:currentStudentId, period:gv('j-period'), mid:gv('j-mid'), mock:gv('j-mock'), hw, hwAns1:gv('hw-ans1'), hwAns2:gv('hw-ans2'), hwCurr:gv('hw-curr'), hwDone:gv('hw-done'), hwSchool:gv('hw-school'), hwRec:gv('hw-rec'), exams, progress, counsel, savedAt:new Date().toISOString().slice(0,10) };
+  return { studentId:currentStudentId, period:gv('j-period'), mid:gv('j-mid'), mock:gv('j-mock'), hw, hwAns, hwCurr:gv('hw-curr'), hwDone:gv('hw-done'), hwSchool:gv('hw-school'), hwRec:gv('hw-rec'), exams, progress, counsel, savedAt:new Date().toISOString().slice(0,10) };
 }
 function saveJournal() {
   const j = readJournalForm();
@@ -542,7 +543,33 @@ function renderParentView() {
         <tr>${[1,2,3,4,5,6,7,8].map(i=>`<td><span class="${symClass(j.hw&&j.hw[i])}">${j.hw&&j.hw[i]||'-'}</span></td>`).join('')}</tr>
         <tr><th rowspan="2"></th><th>#9</th><th>#10</th><th>#11</th><th>#12</th><th>낙오1회</th><th>낙오2회</th><th>낙오3회</th><th>낙오4회</th></tr>
         <tr>${[9,10,11,12,13,14,15,16].map(i=>`<td><span class="${symClass(j.hw&&j.hw[i])}">${j.hw&&j.hw[i]||'-'}</span></td>`).join('')}</tr>
-        <tr><th>오답노트</th><td colspan="4">1회: <span class="${symClass(j.hwAns1)}">${j.hwAns1||'-'}</span></td><td colspan="4">2회: <span class="${symClass(j.hwAns2)}">${j.hwAns2||'-'}</span></td></tr>
+        <tr>
+          <th>오답노트</th>
+          <td colspan="8" style="padding:0;">
+            <table style="width:100%; border-collapse:collapse; border:none;">
+              <tr style="border-bottom:1px solid #bbb;">
+                <th style="border:none; border-right:1px solid #bbb; width:12.5%;">1회</th>
+                <th style="border:none; border-right:1px solid #bbb; width:12.5%;">2회</th>
+                <th style="border:none; border-right:1px solid #bbb; width:12.5%;">3회</th>
+                <th style="border:none; border-right:1px solid #bbb; width:12.5%;">4회</th>
+                <th style="border:none; border-right:1px solid #bbb; width:12.5%;">5회</th>
+                <th style="border:none; border-right:1px solid #bbb; width:12.5%;">6회</th>
+                <th style="border:none; border-right:1px solid #bbb; width:12.5%;">7회</th>
+                <th style="border:none; width:12.5%;">8회</th>
+              </tr>
+              <tr>
+                <td style="border:none; border-right:1px solid #bbb;"><span class="${symClass(j.hwAns&&j.hwAns[1])}">${j.hwAns&&j.hwAns[1]||'-'}</span></td>
+                <td style="border:none; border-right:1px solid #bbb;"><span class="${symClass(j.hwAns&&j.hwAns[2])}">${j.hwAns&&j.hwAns[2]||'-'}</span></td>
+                <td style="border:none; border-right:1px solid #bbb;"><span class="${symClass(j.hwAns&&j.hwAns[3])}">${j.hwAns&&j.hwAns[3]||'-'}</span></td>
+                <td style="border:none; border-right:1px solid #bbb;"><span class="${symClass(j.hwAns&&j.hwAns[4])}">${j.hwAns&&j.hwAns[4]||'-'}</span></td>
+                <td style="border:none; border-right:1px solid #bbb;"><span class="${symClass(j.hwAns&&j.hwAns[5])}">${j.hwAns&&j.hwAns[5]||'-'}</span></td>
+                <td style="border:none; border-right:1px solid #bbb;"><span class="${symClass(j.hwAns&&j.hwAns[6])}">${j.hwAns&&j.hwAns[6]||'-'}</span></td>
+                <td style="border:none; border-right:1px solid #bbb;"><span class="${symClass(j.hwAns&&j.hwAns[7])}">${j.hwAns&&j.hwAns[7]||'-'}</span></td>
+                <td style="border:none;"><span class="${symClass(j.hwAns&&j.hwAns[8])}">${j.hwAns&&j.hwAns[8]||'-'}</span></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
         <tr><th>교재</th><td colspan="4" class="left">진행 중: ${j.hwCurr||'-'}</td><td colspan="4" class="left">완료: ${j.hwDone||'-'}</td></tr>
       </table>
     </div>
@@ -582,3 +609,7 @@ function hide(id) { document.getElementById(id).style.display='none'; }
 </script>
 </body>
 </html>
+    
+
+ 
+ 
